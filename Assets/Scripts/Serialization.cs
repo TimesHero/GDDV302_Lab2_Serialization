@@ -53,19 +53,19 @@ public class Serialization : MonoBehaviour
     {
         // Build a file path string that points to the persistent data path using the filename provided.
         string path = Application.persistentDataPath + "/" + filename;
-        Debug.Log($"The Save file, <color=green>{filename}</color> has been assigned the file path of: <color=lightblue>{path}</color>.");
+        //Debug.Log($"The Save file, <color=green>{filename}</color> has been assigned the file path of: <color=lightblue>{path}</color>.");
 
         // Set up the tools needed to handle XML serialization.
         XmlSerializer playerNameSerializer = new XmlSerializer(typeof(List<PlayerData>));
-        Debug.Log($"<color=orange>Player Name Serializer prepared.</color>");
+        //Debug.Log($"<color=orange>Player Name Serializer prepared.</color>");
 
         // Prepare a writer to hold the serialized data in memory.
         StringWriter xmlMemoryBuffer = new StringWriter();
-        Debug.Log($"XML Memory Buffer String prepared.");
+        //Debug.Log($"XML Memory Buffer String prepared.");
 
         // Serialize the data in playerDataList to that writer.
         playerNameSerializer.Serialize(xmlMemoryBuffer, playerDataList);
-        Debug.Log($"Player Data List Serialized: <color=yellow>{xmlMemoryBuffer.ToString()}</color>");
+        //ebug.Log($"Player Data List Serialized: <color=yellow>{xmlMemoryBuffer.ToString()}</color>");
 
         // Write the final serialized output to the file path.
         File.WriteAllText(path, xmlMemoryBuffer.ToString());
@@ -77,18 +77,18 @@ public class Serialization : MonoBehaviour
     {
         // Build a file path string that points to the persistent data path using the filename provided.
         string path = Application.persistentDataPath + "/" + filename;
-        Debug.Log($"The Save file, <color=green>{filename}</color> should be found at: <color=lightblue>{path}</color>.");
+        //Debug.Log($"The Save file, <color=green>{filename}</color> should be found at: <color=lightblue>{path}</color>.");
 
         // Set up the tools to handle XML deserialization.
         XmlSerializer playerNameSerializer = new XmlSerializer(typeof(List<PlayerData>));
-        Debug.Log($"<color=orange>Player Name Serializer prepared.</color>");
+        //Debug.Log($"<color=orange>Player Name Serializer prepared.</color>");
 
         // Read all the contents from the file path.
         string xmlText;
         if (File.Exists(path))
         {
             xmlText = System.IO.File.ReadAllText(path);
-            Debug.Log($"The save file, <color=green>{filename}</color>, has been found.");
+            //Debug.Log($"The save file, <color=green>{filename}</color>, has been found.");
         }
         else
         {
@@ -98,7 +98,7 @@ public class Serialization : MonoBehaviour
 
         // Prepare a reader for the string 
         StringReader reader = new StringReader(xmlText);
-        Debug.Log($"StringReader prepared.");
+        //Debug.Log($"StringReader prepared.");
 
         // Deserialize the contents into playerDataList.
         var loadedList = (List<PlayerData>)playerNameSerializer.Deserialize(reader);
@@ -110,10 +110,21 @@ public class Serialization : MonoBehaviour
     // 5 MARKS
     private void CreatePlayers()
     {
-        // Using whichever method you like (query or method syntax), use Linq to create an array of PlayerData called eligiblePlayers
-        // that contains only players whose healthRemaining property is greater than 0.3.
+        // Using whichever method you like (query or method syntax), use Linq to create an array of PlayerData 
+        // called eligiblePlayers that contains only players whose healthRemaining property is greater than 0.3.
+        var eligiblePlayers = playerDataList.Where(p => p.healthRemaining > 0.3f).ToArray();
+        Debug.Log($"Eligible Players: {eligiblePlayers.Length}");
 
         // For each PlayerData retrieved and stored in eligiblePlayers, instantiate a new playerUIPrefab and set its position, 
         // playerName text, and healthFill fill amount accordingly. Refer to PlayerUIController for property details.
+        foreach(var p in eligiblePlayers)
+        {
+            GameObject uiInstance = Instantiate(playerUIPrefab);
+            uiInstance.transform.position = new Vector3(p.position.x, p.position.y, 0f);
+            PlayerUIController controller = uiInstance.GetComponent<PlayerUIController>();
+            controller.PlayerName.text = p.playerName;
+            controller.HealthFill.fillAmount = p.healthRemaining;
+        }
+
     }
 }
