@@ -51,7 +51,7 @@ public class Serialization : MonoBehaviour
     // 5 MARKS
     private void SaveToXML()
     {
-        // Build a file path string that points to the persistant data path using the filename provided.
+        // Build a file path string that points to the persistent data path using the filename provided.
         string path = Application.persistentDataPath + "/" + filename;
         Debug.Log($"The Save file, <color=green>{filename}</color> has been assigned the file path of: <color=lightblue>{path}</color>.");
 
@@ -75,15 +75,36 @@ public class Serialization : MonoBehaviour
     // 5 MARKS
     private void LoadFromXML()
     {
-        // Build a file path string that points to the persistant data path using the filename provided.
+        // Build a file path string that points to the persistent data path using the filename provided.
+        string path = Application.persistentDataPath + "/" + filename;
+        Debug.Log($"The Save file, <color=green>{filename}</color> should be found at: <color=lightblue>{path}</color>.");
 
         // Set up the tools to handle XML deserialization.
+        XmlSerializer playerNameSerializer = new XmlSerializer(typeof(List<PlayerData>));
+        Debug.Log($"<color=orange>Player Name Serializer prepared.</color>");
 
         // Read all the contents from the file path.
+        string xmlText;
+        if (File.Exists(path))
+        {
+            xmlText = System.IO.File.ReadAllText(path);
+            Debug.Log($"The save file, <color=green>{filename}</color>, has been found.");
+        }
+        else
+        {
+            Debug.LogWarning($"Save File does not exist!");
+            return;
+        }
 
         // Prepare a reader for the string 
-        
+        StringReader reader = new StringReader(xmlText);
+        Debug.Log($"StringReader prepared.");
+
         // Deserialize the contents into playerDataList.
+        var loadedList = (List<PlayerData>)playerNameSerializer.Deserialize(reader);
+        playerDataList = loadedList;
+        Debug.Log($"List Loaded!");
+
     }
 
     // 5 MARKS
